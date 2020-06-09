@@ -20,12 +20,18 @@ body {
 	--color-link-hover: #252528;
 	--color-menu-text: #252528;
 	--color-bg-move: #afb6bc;
+
+	/* Cursor styles */
+	--cursor-stroke: #ffffff;
+	--cursor-fill: none;
+	--cursor-stroke-width: 1px;
+
 	color: var(--color-text);
 	background-color: var(--color-bg);
 	font-family: fieldwork-hum, sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	cursor: none;
+	/* cursor: none; */
 }
 
 main {
@@ -297,6 +303,10 @@ a:focus {
 	background-size: 100% 100%;
 }
 
+.cursor {
+	display: none;
+}
+
 @media screen and (min-width: 53em) {
 	.frame {
 		position: fixed;
@@ -367,20 +377,16 @@ a:focus {
 
 @media (any-pointer: fine) {
 	.cursor {
-		display: block;
-	}
-	.cursor__inner {
-		z-index: 9999;
-		pointer-events: none;
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
-		mix-blend-mode: difference;
-		border-radius: 50%;
+		display: block;
+		pointer-events: none;
+		opacity: 0;
 	}
-	.cursor__inner--circle {
-		width: 25px;
-		height: 25px;
-		border: 1px solid #fff;
+	.cursor__inner {
+		fill: var(--cursor-fill);
+		stroke: var(--cursor-stroke);
+		stroke-width: var(--cursor-stroke-width);
 	}
 }
