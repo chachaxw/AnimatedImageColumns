@@ -34,9 +34,26 @@
 //   }
 // }
 
-import { MathUtils } from './utils';
+import { EventEmitter } from './events.mjs';
+import { getMousePos, MathUtils } from './utils.mjs';
 
-export class Cursor {
+let winSize;
+const calcWinSize = () => winSize = {
+  width: window.innerWidth,
+  height: window.innerHeight
+};
+
+calcWinSize();
+window.addEventListener('resize', calcWinSize);
+
+let mousePos = {
+  x: winSize.width / 2,
+  y: winSize.height / 2,
+};
+
+window.addEventListener('mousemove', ev => mousePos = getMousePos(ev));
+
+export class Cursor extends EventEmitter {
   constructor(el) {
     super();
 
@@ -62,9 +79,9 @@ export class Cursor {
     this.listen();
 
     this.onMouseMoveEv = () => {
-      this.renderedStyles.tx.previous = this.renderedStyles.tx.current = mouse.x - this.bounds.width / 2;
-      this.renderedStyles.ty.previous = this.renderedStyles.ty.previous = mouse.y - this.bounds.height / 2;
-      TweenMax.to(this.DOM.el, {duration: 0.9, ease: 'Power3.easeOut', opacity: 1});
+      this.renderedStyles.tx.previous = this.renderedStyles.tx.current = mousePos.x - this.bounds.width / 2;
+      this.renderedStyles.ty.previous = this.renderedStyles.ty.previous = mousePos.y - this.bounds.height / 2;
+      gsap.to(this.DOM.el, {duration: 0.9, ease: 'Power3.easeOut', opacity: 1});
       requestAnimationFrame(() => this.render());
       window.removeEventListener('mousemove', this.onMouseMoveEv);
     }
@@ -72,8 +89,8 @@ export class Cursor {
   }
 
   render() {
-    this.renderedStyles['tx'].current = mouse.x - this.bounds.width/2;
-    this.renderedStyles['ty'].current = mouse.y - this.bounds.height/2;
+    this.renderedStyles['tx'].current = mousePos.x - this.bounds.width/2;
+    this.renderedStyles['ty'].current = mousePos.y - this.bounds.height/2;
 
     for (const key in this.renderedStyles ) {
       this.renderedStyles[key].previous = MathUtils.lerp(this.renderedStyles[key].previous, this.renderedStyles[key].current, this.renderedStyles[key].amt);
@@ -87,7 +104,7 @@ export class Cursor {
 
   createTimeline() {
     // init timeline
-    this.tl = TweenMax.timeline({
+    this.tl = gsap.timeline({
       paused: true,
       onStart: () => {
           this.DOM.circleInner.style.filter = `url(${this.filterId}`;
@@ -113,12 +130,12 @@ export class Cursor {
   }
 
   enter() {
-    this.renderedStyles['radius'].current = 120;
+    this.renderedStyles['radius'].current = 80;
     this.tl.restart();
   }
 
   leave() {
-    this.renderedStyles['radius'].current = 50;
+    this.renderedStyles['radius'].current = 40;
     this.tl.progress(1).kill();
   }
 
